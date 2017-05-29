@@ -53,18 +53,18 @@ struct OverlappedOperation
 
 struct ASSOCKDESC
 {
-	ASSOCKUID		assockUid;
+	ULONG_PTR		assockUid;
 	LARGE_INTEGER	tick;
 
 	ASSOCKDESC() : assockUid(), tick()
 	{
 	}
 
-	ASSOCKDESC(ASSOCKUID assockUid, LARGE_INTEGER& tick) : assockUid(assockUid), tick(tick)
+	ASSOCKDESC(ULONG_PTR assockUid, LARGE_INTEGER& tick) : assockUid(assockUid), tick(tick)
 	{
 	}
 
-	ASSOCKDESC(ASSOCKUID assockUid, LARGE_INTEGER* atick) : assockUid(assockUid), tick()
+	ASSOCKDESC(ULONG_PTR assockUid, LARGE_INTEGER* atick) : assockUid(assockUid), tick()
 	{
 		if(atick)
 		{
@@ -116,14 +116,14 @@ public:
 		return sAsynchSocketPrototype;
 	}
 	
-	static ASSOCKUID retrieveASSOCKUID()
+	static ULONG_PTR retrieveASSOCKUID()
 	{
 		Synchronized sync(&assockuidGenLock);
-		ASSOCKUID id = assockuidGen.retrieve();
+		ULONG_PTR id = assockuidGen.retrieve();
 		return id;
 	}
 
-	static void releaseASSOCKUID(ASSOCKUID id)
+	static void releaseASSOCKUID(ULONG_PTR id)
 	{
 		Synchronized sync(&assockuidGenLock);
 		assockuidGen.release(id);
@@ -157,7 +157,7 @@ public:
 		return closed; 
 	}
 
-	ASSOCKUID getASSOCKUID()
+	ULONG_PTR getASSOCKUID()
 	{
 		return assockDesc.assockUid;
 	}
@@ -246,12 +246,12 @@ public:
 	//socketUniqueId: 소켓관리번호, 연결통보시 넘겨준 관리번호 [SOCKET으로 주어지는 번호와는 다르다!], 자료구조키값임
 	//length: 길이
 	//data: 실제 내용
-	//virtual DWORD postingSend(ASSOCKUID socketUniqueId, LARGE_INTEGER* tick, size_t length, char* data) = 0;
+	//virtual DWORD postingSend(ULONG_PTR socketUniqueId, LARGE_INTEGER* tick, size_t length, char* data) = 0;
 	virtual DWORD postingSend(ASSOCKDESC& sockdesc, size_t length, char* data) = 0;
 
 	//연결해제 요청
 	//uniqueId: 소켓관리번호, 연결통보시 넘겨준 관리번호
-	virtual DWORD disconnectSocket(ASSOCKUID uniqueId, LARGE_INTEGER* tick) = 0;
+	virtual DWORD disconnectSocket(ULONG_PTR uniqueId, LARGE_INTEGER* tick) = 0;
 	virtual DWORD disconnectSocket(ASSOCKDESC& sockdesc) = 0;
 
 	//연결 요청
@@ -273,7 +273,7 @@ public:
 	// 20070411
 	//	socketUniqueId 반환
 	//	응용계층에서 해당 값을 사용중인데, 네트워크 계층에서 이 값을 재사용해버리는 문제점을 없애기 위해서이다.
-	virtual DWORD releaseSocketUniqueId( ASSOCKUID socketUniqueId ) = 0;
+	virtual DWORD releaseSocketUniqueId( ULONG_PTR socketUniqueId ) = 0;
 
 	virtual DWORD registerSocket(SOCKET sockid, AsynchSocket* prototype, SOCKADDR_IN& addrin) = 0;
 

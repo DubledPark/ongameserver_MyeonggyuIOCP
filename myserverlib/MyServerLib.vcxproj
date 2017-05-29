@@ -453,7 +453,6 @@
     <ClCompile Include="ExceptionReport.cpp" />
     <ClCompile Include="RichODBC.cpp" />
     <ClCompile Include="Thread.cpp" />
-    <ClCompile Include="PathFinder.cpp" />
     <ClCompile Include="StreamData.cpp" />
     <ClCompile Include="TraditionalMemoryPool.cpp" />
   </ItemGroup>
@@ -467,12 +466,8 @@
     <ClInclude Include="Synchronized.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="TraditionalMemoryPool.h" />
-    <ClInclude Include="variver.h" />
-    <ClInclude Include="variverd.h" />
-    <ClInclude Include="variverr.h" />
     <ClInclude Include="DataBuffer.h" />
     <ClInclude Include="maths.h" />
-    <ClInclude Include="PathFinder.h" />
     <ClInclude Include="Queue.h" />
     <ClInclude Include="StreamData.h" />
   </ItemGroup>

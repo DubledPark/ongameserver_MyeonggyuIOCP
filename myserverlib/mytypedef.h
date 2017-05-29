@@ -7,9 +7,8 @@
 #include <windows.h>
 
 
-typedef int INT32;
-
-typedef ULONG_PTR ASSOCKUID;
+//typedef int INT32;
+//typedef ULONG_PTR ASSOCKUID;
 
 
 #endif

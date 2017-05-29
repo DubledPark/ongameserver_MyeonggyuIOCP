@@ -1,6 +1,3 @@
-#ifndef MATHS_H
-#define MATHS_H
-
 #pragma once
 
 #include "variver.h"
@@ -15,16 +12,17 @@ public:
 	static const ULONG_PTR cMinMultiple = 1;
 	static const ULONG_PTR cMaxMultiple = 10000;
 
-private:
-	
-	tREUSELIST		reuseList;
-	ULONG_PTR		multiple;
-	ULONG_PTR		currentNumber;
 
 public:
-	ULONG_PTRGenerator(ULONG_PTR start=cDefaultStart, ULONG_PTR multiple=cMinMultiple) : reuseList(), currentNumber(start), multiple(multiple)
+	ULONG_PTRGenerator(ULONG_PTR start=cDefaultStart, 
+						ULONG_PTR multiple=cMinMultiple) : 
+														reuseList(), 
+														currentNumber(start), 
+														multiple(multiple)
 	{
-		if(cMinMultiple > multiple || cMaxMultiple < multiple) throw "multiple error";
+		if (cMinMultiple > multiple || cMaxMultiple < multiple) {
+			throw "multiple error";
+		}
 	}
 
 	virtual ~ULONG_PTRGenerator()
@@ -55,9 +53,11 @@ public:
 	{
 		if(bValid)
 		{
-			for( tREUSELISTITER iter = reuseList.begin() ; iter != reuseList.end() ; ++iter )
+			for(auto iter = reuseList.begin() ; iter != reuseList.end() ; ++iter )
 			{
-				if( n == *iter ) return false;
+				if (n == *iter) {
+					return false;
+				}
 			}			
 		}
 
@@ -65,6 +65,11 @@ public:
 		return true;
 	}
 
+
+private:
+	tREUSELIST		reuseList;
+	ULONG_PTR		multiple;
+	ULONG_PTR		currentNumber;
 };
 
 class UniqueIntegerGenerator
@@ -76,16 +81,15 @@ public:
 	static const int cMinMultiple = 1;
 	static const int cMaxMultiple = 10000;
 
-private:
-	
-	tREUSELIST		reuseList;
-	int		multiple;
-	int		currentNumber;
-
 public:
-	UniqueIntegerGenerator(int start=cDefaultStart, int multiple=cMinMultiple) : reuseList(), currentNumber(start), multiple(multiple)
+	UniqueIntegerGenerator(int start=cDefaultStart, 
+							int multiple=cMinMultiple) : reuseList(), 
+														currentNumber(start), 
+														multiple(multiple)
 	{
-		if(cMinMultiple > multiple || cMaxMultiple < multiple) throw "multiple error";
+		if (cMinMultiple > multiple || cMaxMultiple < multiple) {
+			throw "multiple error";
+		}
 	}
 
 	virtual ~UniqueIntegerGenerator()
@@ -116,9 +120,11 @@ public:
 	{
 		if(bValid)
 		{
-			for( tREUSELISTITER iter = reuseList.begin() ; iter != reuseList.end() ; ++iter )
+			for( auto iter = reuseList.begin() ; iter != reuseList.end() ; ++iter )
 			{
-				if( n == *iter ) return false;
+				if (n == *iter) {
+					return false;
+				}
 			}			
 		}
 
@@ -126,30 +132,33 @@ public:
 		return true;
 	}
 
+
+private:
+	tREUSELIST		reuseList;
+	int		multiple;
+	int		currentNumber;
 };
 
-class RandomGenerator
-{
-	unsigned int		w;
-	unsigned int		z;
-public:
+//class RandomGenerator
+//{
+//	unsigned int		w;
+//	unsigned int		z;
+//public:
+//
+//	RandomGenerator(unsigned int sw, unsigned int sz) : w(sw), z(sz)
+//	{
+//	}
+//
+//	~RandomGenerator()
+//	{
+//	}
+//
+//	unsigned int Get()
+//	{
+//		z = 36969 * (z & 65535) + (z >> 16);
+//		w = 18000 * (w & 65535) + (w >> 16);
+//		return (z << 16) + w;
+//	}
+//
+//};
 
-	RandomGenerator(unsigned int sw, unsigned int sz) : w(sw), z(sz)
-	{
-	}
-
-	~RandomGenerator()
-	{
-	}
-
-	unsigned int Get()
-	{
-		z = 36969 * (z & 65535) + (z >> 16);
-		w = 18000 * (w & 65535) + (w >> 16);
-		return (z << 16) + w;
-	}
-
-};
-
-
-#endif
