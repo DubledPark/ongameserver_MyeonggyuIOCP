@@ -1,5 +1,5 @@
 #pragma once
-#include "asios.h"
+#include "../MGServerLib/Asios.h"
 #include <map>
 
 class MGClientReceiver : public INetworkReceiver

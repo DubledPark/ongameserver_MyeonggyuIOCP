@@ -3,9 +3,9 @@
 
 #include "stdafx.h"
 #include <WinSock2.h>
-#include "AsynchIOService.h"
+#include "../MGServerLib/AsynchIOService.h"
 #include "MGClientReceiver.h"
-#include "Acceptor.h"
+#include "../MGServerLib/Acceptor.h"
 
 #pragma comment(lib, "ws2_32.lib") 
 #pragma comment(lib, "MyServerLib.lib") 
