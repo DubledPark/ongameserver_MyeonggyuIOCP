@@ -100,14 +100,14 @@ void CExceptionReport::SetProgramName( PTSTR pszProgramName )
 //
 LONG WINAPI CExceptionReport::UnhandledExceptionFilter( PEXCEPTION_POINTERS pExceptionInfo )
 {
-	TCHAR szFileName[ MAX_PATH ];
+	wchar_t szFileName[MAX_PATH] = { 0, };
 
 	_tcscpy( szFileName, m_szLogPrefixName );
 
     SYSTEMTIME stSystemTime;
 	GetLocalTime( &stSystemTime );
 
-	wsprintf( szFileName + strlen( szFileName ), " %04d-%02d-%02d %02d,%02d,%02d.TXT", 
+	wsprintf( szFileName + wcslen( szFileName ), L"%04d-%02d-%02d %02d,%02d,%02d.TXT", 
 		stSystemTime.wYear, stSystemTime.wMonth, stSystemTime.wDay,
 		stSystemTime.wHour, stSystemTime.wMinute, stSystemTime.wSecond );
 
@@ -324,12 +324,12 @@ void CExceptionReport::WriteMemoryDump( PCONTEXT pContext )
 	_tprintf( _T( "------------------------------------------------------------------------------\r\n" ) );
 	_tprintf( _T( "\r\n" ) );
 
-	_tprintf( _T( "Code: %d bytes starting at (EIP = %08lX)\r\n" ), 16, pContext->Eip );
-	Dump( pContext->Eip, 16, FALSE );
+	_tprintf( _T( "Code: %d bytes starting at (EIP = %08lX)\r\n" ), 16, pContext->Rip );
+	Dump( pContext->Rip, 16, FALSE );
 	_tprintf( _T("\r\n") );
 
-	_tprintf( _T( "Stack: %d bytes starting at (ESP = %08lX)\r\n" ), 1024, pContext->Esp );
-	Dump( pContext->Esp, 1024, TRUE );
+	_tprintf( _T( "Stack: %d bytes starting at (ESP = %08lX)\r\n" ), 1024, pContext->Rsp );
+	Dump( pContext->Rsp, 1024, TRUE );
 	_tprintf( _T("\r\n") );
     _tprintf( _T("\r\n") );
 }
@@ -672,7 +672,7 @@ char *CExceptionReport::FormatOutputValue( char *pszCurrBuffer, BasicType basicT
         if ( basicType == btFloat ) {
             pszCurrBuffer += sprintf(pszCurrBuffer," = %f", *(PFLOAT)pAddress);
         } else if ( basicType == btChar ) {
-            if( !IsBadStringPtr( *(PSTR*)pAddress, 32) ) {
+            if( !IsBadStringPtr( *(LPCWSTR*)pAddress, 32) ) {
                 pszCurrBuffer += sprintf( pszCurrBuffer, " = \"%.31s\"", *(PDWORD)pAddress );
 			} else
                 pszCurrBuffer += sprintf( pszCurrBuffer, " = %X", *(PDWORD)pAddress );
@@ -731,7 +731,7 @@ void CExceptionReport::Dump( DWORD64 dw64Offset, DWORD dwSize, BOOL bAlign )
 			}
 		}
 		pLine = pOut;
-		_tprintf( " " );
+		_tprintf( L" " );
 		for( dwX = 0, dwILoc = dwLoc; dwX < BYTES_PER_LINE; dwX++ ) {
 			if( dwILoc++ > dwSize ) {
 				_tprintf( _T( " " ) );
@@ -740,7 +740,7 @@ void CExceptionReport::Dump( DWORD64 dw64Offset, DWORD dwSize, BOOL bAlign )
 				pLine++;
 			}
 		}
-		_tprintf( "\r\n" );
+		_tprintf( L"\r\n" );
 	}
 }
 
@@ -755,7 +755,7 @@ int __cdecl CExceptionReport::_tprintf( const TCHAR * format, ... )
     va_list argptr;
 
     va_start( argptr, format );
-    retValue = vsprintf( szBuff, format, argptr );
+    retValue = vswprintf( szBuff, format, argptr );
     va_end( argptr );
     WriteFile( m_hReportFile, szBuff, retValue * sizeof( TCHAR ), &cbWritten, 0 );
     return retValue;

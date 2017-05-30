@@ -2,8 +2,8 @@
 
 // 여러 AsynchIOService가 아래의 객체를 사용한다면
 //	assockuidGen 자체가 synchronization을 만족해야 한다.
-ULONG_PTRGenerator AsynchSocket::assockuidGen;
-CriticalSectionLock	AsynchSocket::assockuidGenLock;
+ULONG_PTRGenerator			AsynchSocket::assockuidGen;
+CriticalSectionLockWrapper	AsynchSocket::assockuidGenLock;
 
 AsynchSocket* AsynchSocket::sAsynchSocketPrototype = NULL;
 

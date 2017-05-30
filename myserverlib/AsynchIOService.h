@@ -1,9 +1,6 @@
-#ifndef AsynchIOService_H
-#define AsynchIOService_H
-
 #pragma once
 
-#include "variver.h"
+
 #include "asios.h"
 #include "Thread.h"
 #include "Synchronized.h"
@@ -27,13 +24,13 @@ protected:
 	size_t					ioMaxSize;
 	HANDLE					iocpHandle;
 	
-	typedef std::map<ASSOCKUID, AsynchSocket*> tASSOCKMAP;
-	typedef std::map<ASSOCKUID, AsynchSocket*>::iterator tASSOCKMAPITER;
+	typedef std::map<ULONG_PTR, AsynchSocket*> tASSOCKMAP;
+	typedef std::map<ULONG_PTR, AsynchSocket*>::iterator tASSOCKMAPITER;
 	tASSOCKMAP theASSocks;
 
-	CriticalSectionLock		entireSynch;
-	CriticalSectionLock		ioFrameSynch;
-	CriticalSectionLock		logSynch;
+	CriticalSectionLockWrapper		entireSynch;
+	CriticalSectionLockWrapper		ioFrameSynch;
+	CriticalSectionLockWrapper		logSynch;
 
 	std::deque< OverlappedOperation* >	ioFramePools;
 
@@ -74,10 +71,10 @@ protected:
 public:
 	//virtual DWORD postingSend(ASSOCKUID socketUniqueId, LARGE_INTEGER* tick, size_t length, char* data);
 	virtual DWORD postingSend(ASSOCKDESC& sockdesc, size_t length, char* data);
-	virtual DWORD disconnectSocket(ASSOCKUID uniqueId, LARGE_INTEGER* tick);
+	virtual DWORD disconnectSocket(ULONG_PTR uniqueId, LARGE_INTEGER* tick);
 	virtual DWORD disconnectSocket(ASSOCKDESC& sockdesc);
 	virtual DWORD connectSocket(INT32 reqeusterID, AsynchSocket* prototype, char* ip, u_short port);
-	virtual DWORD releaseSocketUniqueId( ASSOCKUID socketUniqueId );
+	virtual DWORD releaseSocketUniqueId(ULONG_PTR socketUniqueId );
 	virtual DWORD registerSocket(SOCKET sockid, AsynchSocket* prototype, SOCKADDR_IN& addrin);
 	virtual size_t getIOMaxSize() { return ioMaxSize; }
 
@@ -90,7 +87,7 @@ public:
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // implementation for Runnable
 public:
-	void run(Thread* info);
+	void Run(Thread* info);
 
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,5 +95,3 @@ public:
 
 
 };
-
-#endif

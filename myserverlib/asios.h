@@ -1,10 +1,5 @@
-#ifndef ASIOS_H
-#define ASIOS_H
-
 #pragma once
 
-#include "variver.h"
-#include "mytypedef.h"
 #include "maths.h"
 #include "Synchronized.h"
 
@@ -96,7 +91,7 @@ private:
 
 protected:
 	static ULONG_PTRGenerator	assockuidGen;
-	static CriticalSectionLock	assockuidGenLock;
+	static CriticalSectionLockWrapper	assockuidGenLock;
 
 protected:
 	SOCKET			sockID;
@@ -318,4 +313,3 @@ public:
 	virtual void notifyConnectingResult(INT32 requestID, ASSOCKDESCEX& sockdesc, DWORD error) = 0;
 };
 
-#endif

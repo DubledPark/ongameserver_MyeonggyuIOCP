@@ -1,5 +1,4 @@
-#ifndef StreamData_H
-#define StreamData_H
+#pragma once
 
 #include <windows.h>
 
@@ -7,98 +6,99 @@ const size_t StreamDataSize = 64000;
 
 class StreamData
 {
-
-protected:
-
-	char	value[StreamDataSize];
-
-	unsigned int	capacity;
-
-	unsigned int	sizeOfReceived;
-
-
 public:
-
-	StreamData(): capacity(StreamDataSize), sizeOfReceived(0)
+	StreamData()
 	{
 		reset();
 	}
 
-	virtual ~StreamData()
-	{
-	}
+	virtual ~StreamData() = default;
+	
 
 public:	
-
 	virtual StreamData* clone()
 	{
 		StreamData * o = new StreamData();
-		CopyMemory(o->value, this->value, StreamDataSize);
-		o->sizeOfReceived = sizeOfReceived;
-		o->capacity = capacity;
+		CopyMemory(o->m_Value, this->m_Value, StreamDataSize);
+		o->m_SizeOfReceived = m_SizeOfReceived;
+		o->m_Capacity = m_Capacity;
 		return o;
 	}
 
 	char* current() 
 	{ 
-		return value+sizeOfReceived; 
+		return m_Value+m_SizeOfReceived; 
 	}
 
 	void increaseSize(int sz) 
 	{
-		sizeOfReceived += sz; 
+		m_SizeOfReceived += sz; 
 	}
 
 	char* getStream() 
 	{ 
-		return value;
+		return m_Value;
 	}
 
 	unsigned int getSize() 
 	{ 
-		return sizeOfReceived;
+		return m_SizeOfReceived;
 	}
 
 	unsigned int getCapacity() 
 	{ 
-		return capacity;
+		return m_Capacity;
 	}
 
 	unsigned int availableSize() 
 	{
-		return capacity-sizeOfReceived;
+		return m_Capacity-m_SizeOfReceived;
 	}
 
 	void reset()
 	{
-		sizeOfReceived = 0;
-		ZeroMemory(value, sizeof(value));
+		m_SizeOfReceived = 0;
+		ZeroMemory(m_Value, sizeof(m_Value));
 	}
 
 	void flushTo(unsigned int sz)
 	{
-		if (sizeOfReceived > sz)
+		if (m_SizeOfReceived > sz)
 		{
-			memmove(value,value+sz,sizeOfReceived-sz);
-			sizeOfReceived-=sz;
+			memmove(m_Value,m_Value+sz,m_SizeOfReceived-sz);
+			m_SizeOfReceived-=sz;
 		}
-		else sizeOfReceived=0;
+		else 
+		{
+			m_SizeOfReceived = 0;
+		}
 	}
 
 	unsigned int putData(unsigned int size, char* datas)
 	{
-		if(0 >= size) return 0;
+		if (0 >= size) {
+			return 0;
+		}
 
-		if(availableSize() < size) return 0;
+		if (availableSize() < size) {
+			return 0;
+		}
 
 		CopyMemory(current(), datas, size);
 		increaseSize(size);
 		return size;
 	}	
 
+
+
+protected:
+	char	m_Value[StreamDataSize];
+
+	unsigned int	m_Capacity = StreamDataSize;
+
+	unsigned int	m_SizeOfReceived = 0;
 };
 
 
 
 
-#endif

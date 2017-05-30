@@ -1,56 +1,48 @@
-#ifndef Thread_H
-#define Thread_H
-
 #pragma once
 
-#include "variver.h"
 #include <windows.h>
 
 class Thread;
+
 class Runnable
 {
 public:
-	virtual void run(Thread* info) = 0;
+	virtual void Run(Thread* info) = 0;
 };
 
 class Thread
 {
-protected:
-
-	Runnable*				runner;
-	volatile unsigned int	isStarted;
-	unsigned		identifier;
-	HANDLE			handle;
-
-protected:
-
-	//static DWORD WINAPI		handleRunner(LPVOID parameter);
-	static unsigned __stdcall handleRunner(void* parameter);
-
-public:
-	
-	Thread();
+public:	
+	Thread() = default;
 	Thread(Runnable* r);
 	virtual ~Thread();
 
-	virtual	unsigned int isStart() { return isStarted;}
+	virtual	unsigned int IsStart() { return m_IsStarted;}
 
-	virtual	DWORD resume();
+	virtual	DWORD Resume() { return ::ResumeThread(m_Handle); }
 
-	virtual void run();
+	virtual void Run() {}
 
-	virtual	DWORD start();
+	virtual	DWORD Start();
 
-	virtual	void sleep(long millis);	
+	virtual	void Sleep(long millis);	
 
-	virtual	void stop();
+	virtual	void Stop() { m_IsStarted = FALSE; }
 
-	virtual	DWORD suspend();	
+	virtual	DWORD Suspend() { return ::SuspendThread(m_Handle); }
 
-	virtual	void terminated();
+	virtual	void Join() { Stop(); }
 
-	virtual	bool waitFor();
+	virtual	bool WaitFor();
 
+
+protected:
+	static unsigned __stdcall handleRunner(void* parameter);
+
+protected:
+	Runnable*				m_Runner = nullptr;
+	volatile unsigned int	m_IsStarted = false;
+	unsigned		m_Identifier = 0;
+	HANDLE			m_Handle = INVALID_HANDLE_VALUE;
 };
 
-#endif

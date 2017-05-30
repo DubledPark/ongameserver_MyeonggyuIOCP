@@ -449,19 +449,15 @@
     <ClCompile Include="Acceptor.cpp" />
     <ClCompile Include="AsynchIOService.cpp" />
     <ClCompile Include="AsynchSocket.cpp" />
-    <ClCompile Include="CodeTest.cpp" />
     <ClCompile Include="ExceptionReport.cpp" />
     <ClCompile Include="RichODBC.cpp" />
     <ClCompile Include="Thread.cpp" />
-    <ClCompile Include="StreamData.cpp" />
-    <ClCompile Include="TraditionalMemoryPool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Acceptor.h" />
     <ClInclude Include="asios.h" />
     <ClInclude Include="AsynchIOService.h" />
     <ClInclude Include="ExceptionReport.h" />
-    <ClInclude Include="mytypedef.h" />
     <ClInclude Include="RichODBC.h" />
     <ClInclude Include="Synchronized.h" />
     <ClInclude Include="Thread.h" />

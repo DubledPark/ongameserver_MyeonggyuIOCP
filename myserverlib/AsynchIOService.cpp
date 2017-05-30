@@ -99,7 +99,7 @@ DWORD AsynchIOService::start()
 {
 	for( DWORD index = 0 ; index < conThread ; ++index )
 	{
-		workers[index]->start();
+		workers[index]->Start();
 	}
 
 	return 0;
@@ -110,7 +110,7 @@ DWORD AsynchIOService::stop()
 	for( DWORD index = 0 ; index < conThread ; ++index )
 	{
 		//workers[index]->terminated();
-		workers[index]->stop();
+		workers[index]->Stop();
 	}
 	return 0;
 }
@@ -138,7 +138,7 @@ void AsynchIOService::releaseIOFrame(OverlappedOperation* op)
 	if(op) ioFramePools.push_back(op);
 }
 
-void AsynchIOService::run(Thread* info)
+void AsynchIOService::Run(Thread* info)
 {
 	logmsg("%d asio thread startd\n", GetCurrentThreadId());
 	// 아래의 지역변수들은 읽기전용이 아니고,
@@ -151,7 +151,7 @@ void AsynchIOService::run(Thread* info)
 	DWORD waittime = 500;
 	
 	//info->isStart()가 반환하는 값은 반드시 volatile이어야 한다.
-	while(info->isStart())
+	while(info->IsStart())
 	{
 		keyValue = 0;
 		lpoverlapped = NULL;
@@ -464,7 +464,7 @@ void AsynchIOService::releaseSocket(AsynchSocket* socket, DWORD why)
 	
 }
 
-DWORD AsynchIOService::disconnectSocket(ASSOCKUID uniqueId, LARGE_INTEGER* tick)
+DWORD AsynchIOService::disconnectSocket(ULONG_PTR uniqueId, LARGE_INTEGER* tick)
 {
 	if(NULL == tick) return WSAEBADF;
 
@@ -598,7 +598,7 @@ DWORD AsynchIOService::connectSocket(INT32 reqeusterID, AsynchSocket* prototype,
 
 // id값은 asynchsocket 추상클래스 영역에서 글로벌하게 관리한다. 상속받은 측에서 따로 할일은 없고, 단지 이 함수만 호출되면 끝~
 //	복수의 asynchioservice에 대해서도 글로벌하게 관리됨.
-DWORD AsynchIOService::releaseSocketUniqueId( ASSOCKUID socketUniqueId )
+DWORD AsynchIOService::releaseSocketUniqueId(ULONG_PTR socketUniqueId )
 {
 	AsynchSocket::releaseASSOCKUID(socketUniqueId);
 	return 0;

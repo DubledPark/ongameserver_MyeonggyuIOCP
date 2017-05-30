@@ -1,14 +1,10 @@
-#ifndef DataBuffer_H
-#define DataBuffer_H
+#pragma once
 
-#include "variver.h"
+
 
 template<size_t SIZE>
 class DataBufferT
 {
-	int			curLength;
-	int			maxLength;
-	char		datas[SIZE];
 public:
 
 	DataBufferT(void)
@@ -16,17 +12,16 @@ public:
 		reset();
 	}
 
-	virtual ~DataBufferT(void)
-	{
-	}
+	virtual ~DataBufferT(void) = default;
 
 	template<class TYPE> 
 	TYPE& addTypeAndGetRefers()
 	{
 		int typelen = sizeof TYPE;
-		if(maxLength-curLength < typelen)
+		if (maxLength - curLength < typelen) {
 			throw "dfdfdf"; // temp code
 			//throw new OutOfBoundException("");
+		}
 
 		TYPE& ret   = *(TYPE*)(datas+curLength);
 		curLength += typelen;
@@ -37,8 +32,9 @@ public:
 	int addTypeAndGetRefers( TYPE** out )
 	{
 		int typelen = sizeof TYPE;
-		if(maxLength-curLength < typelen)
+		if (maxLength - curLength < typelen) {
 			return 1;
+		}
 
 		*out   = (TYPE*)(datas+curLength);
 		curLength += typelen;
@@ -47,9 +43,11 @@ public:
 
 	const char dataAt(int index)
 	{
-		if( 0 > index || curLength <= index )
+		if (0 > index || curLength <= index) {
 			throw "dfdfdf"; // temp code
 			//throw new OutOfBoundException("");
+		}
+
 		return reinterpret_cast<const char>(datas[index]);
 	}
 	
@@ -79,16 +77,17 @@ public:
 	{
 		return reinterpret_cast<const char*>(datas);
 	}
+
+
+private:
+	int			curLength;
+	int			maxLength;
+	char		datas[SIZE];
 };
 
 class ReadOnlyDataBuffer
 {
-	int			curPos;
-	int			maxLength;
-	char*		datas;
-
 public:
-
 	ReadOnlyDataBuffer(char* p, int len)
 	{
 		datas = p;
@@ -181,6 +180,11 @@ public:
 		return bytes;
 	}
 
+
+private:
+	int			curPos;
+	int			maxLength;
+	char*		datas;
 };
 
 class DynamicDataBuffer
@@ -467,4 +471,3 @@ public:
 
 
 
-#endif

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "variver.h"
 #include <deque>
 
 class ULONG_PTRGenerator

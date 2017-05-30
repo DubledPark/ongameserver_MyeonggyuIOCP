@@ -1,6 +1,3 @@
-#ifndef _RICHODBC_H
-#define _RICHODBC_H
-
 // RichODBC.cpp: implementation of the RichODBC class.
 //
 //////////////////////////////////////////////////////////////////////
@@ -305,8 +302,9 @@ int RichODBC::SetQuery(char *pszQuery)
 {
 	Prepare();
 
-	if( sizeof(pszQuery) >= MAX_QUERY_SIZE )
-		MessageBox(NULL, "not enougth buffer.", "Error", MB_OK);
+	if (sizeof(pszQuery) >= MAX_QUERY_SIZE) {
+		MessageBox(NULL, L"not enougth buffer.", L"Error", MB_OK);
+	}
 
 	strncpy_s( m_pszQuery, sizeof(m_pszQuery), pszQuery, MAX_QUERY_SIZE );
 
@@ -345,11 +343,14 @@ return : int(성공시 양수, 실패시 음수)
 ////////////////////////////////////////////////////////////////////*/
 int RichODBC::GetData(int iColNo, void* pvData, long lDataSize)
 {
-	long ntd;
-	if(IsSuccess())
+	SQLLEN ntd;
+	if (IsSuccess()) {
 		m_retcode = SQLGetData(m_hstmt, iColNo, SQL_C_DEFAULT, pvData, lDataSize, &ntd);
-	else
+	}
+	else 
+	{
 		return -1;
+	}
 
 	return 1;
 }
@@ -366,15 +367,19 @@ return : int(성공시 양수, 실패시 음수)
 ////////////////////////////////////////////////////////////////////*/
 int RichODBC::GetData(int iColNo, int iType, void* pvData, long lDataSize)
 {
-	long ntd;
+	SQLLEN ntd;
 	if(IsSuccess())
 	{
 		m_retcode = SQLGetData(m_hstmt, iColNo, iType, pvData, lDataSize, &ntd);
-		if(m_retcode == -1)
+		
+		if (m_retcode == -1) {
 			CheckError(SQL_HANDLE_STMT, m_hstmt, m_pszQuery);
+		}
 	}
 	else
+	{
 		return -1;
+	}
 
 	return 1;
 }
@@ -398,8 +403,10 @@ bool RichODBC::FetchData()
 	}
 	else
 	{
-		if ( m_retcode != SQL_NO_DATA )
+		if (m_retcode != SQL_NO_DATA) {
 			CheckError(SQL_HANDLE_STMT, m_hstmt);
+		}
+
 		return false;
 	}
 }
@@ -416,12 +423,16 @@ bool RichODBC::NextRecordSet()
 	time( &m_tNEXTRECORDSET );
 
 	m_retcode = SQLMoreResults(m_hstmt);
-	if(IsSuccess())
+
+	if (IsSuccess()) {
 		return true;
+	}
 	else
 	{
-		if(m_retcode == SQL_NO_DATA)
+		if (m_retcode == SQL_NO_DATA) {
 			return false;
+		}
+
 		CheckError(SQL_HANDLE_STMT, m_hstmt);
 		return false;
 	}
@@ -478,7 +489,7 @@ BOOL RichODBC::CheckError(SQLSMALLINT hType, SQLHANDLE handle, char* hint, HWND 
 		ZeroMemory ( err, sizeof(Msg ) );
 		NativeError = 0;
 		MsgLen = 0;
-		thisRet = SQLGetDiagRec(hType, handle, i, SqlState, &NativeError, Msg, sizeof(Msg), &MsgLen);
+		thisRet = SQLGetDiagRecA(hType, handle, i, SqlState, &NativeError, Msg, sizeof(Msg), &MsgLen);
 
 		if( SQL_NO_DATA == thisRet || SQL_INVALID_HANDLE == thisRet )
 			break;
@@ -555,34 +566,35 @@ BOOL RichODBC::CheckError(SQLSMALLINT hType, SQLHANDLE handle, char* hint, HWND 
 	return ret;
 }
 
-BOOL RichODBC::CheckMDAC(char *cRequire)
+BOOL RichODBC::CheckMDAC(wchar_t *cRequire)
 {
 	HKEY hKey;
-	char cData[256]= "";
-	char msg[1024];
+	wchar_t cData[256] = { 0, };
+	wchar_t msg[1024] = { 0, };
 	LONG result = 0;
 	BOOL ret = FALSE;
 	DWORD size = sizeof(cData);
 
-	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\DataAccess", 0, KEY_READ, &hKey);
+	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\DataAccess", 0, KEY_READ, &hKey);
 	if(result != ERROR_SUCCESS)
 	{
 		printf("Registry Open Failed : %d\n", result);
 	}
 
-	result = RegQueryValueEx(hKey, "FullInstallVer", 0, NULL, (BYTE*)cData, &size);
+	result = RegQueryValueEx(hKey, L"FullInstallVer", 0, NULL, (BYTE*)cData, &size);
 	if(result != ERROR_SUCCESS)
 	{
 		printf("Registry Query Failed : %d\n", result);
 	}
 	else
 	{
-		if(strcmp(cData, cRequire) >= 0)
+		if (wcscmp(cData, cRequire) >= 0) {
 			ret = TRUE;
+		}
 		else
 		{
-			sprintf(msg, "요구버전 : %s\n현재버전 : %s", cRequire, cData);
-			MessageBox(NULL, msg, "MDAC Version", MB_OK);
+			wsprintf(msg, L"요구버전 : %s\n현재버전 : %S", cRequire, cData);
+			MessageBox(NULL, msg, L"MDAC Version", MB_OK);
 		}
 	}
 
@@ -646,14 +658,14 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 	char buffer[100];
 	ZeroMemory(buffer, sizeof(buffer));
 
-	SQLINTEGER *pStrLen_or_IndPtr;
+	SQLLEN *pStrLen_or_IndPtr;
 
 
 	switch(siType)
 	{
 	case SQL_WCHAR:
 		{
-			pStrLen_or_IndPtr = bNull?&m_siNULL:&m_siNTS;
+			pStrLen_or_IndPtr = bNull? &m_siNULL : &m_siNTS;
 			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_WCHAR, SQL_WCHAR, siDatasize, 0, pData, 0, pStrLen_or_IndPtr);
 			//PrintParam((char*)pData);
 		}
@@ -682,11 +694,14 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 #ifdef _SIZE_ERROR_MESSAGE
 			if(siDatasize != sizeof(char))
 			{
-				char err[2048] = "";
-				wsprintf( err, "ParamNo = %d, RequireSize = SQL_BIT(1Byte), InputSize = %d\n%s\n", siParamNo, siDatasize, m_pszQuery);
+				wchar_t err[1024] = { 0, };
+				wsprintf( err, L"ParamNo = %d, RequireSize = SQL_BIT(1Byte), InputSize = %d\n%s\n", siParamNo, siDatasize, m_pszQuery);
+				
 				BOOL bServer = REGULAR_SERVER ;
-				if ( !bServer )
-					MessageBox(NULL, err, "DataType is Wrong", MB_OK);
+
+				if (!bServer) {
+					MessageBox(NULL, err, L"DataType is Wrong", MB_OK);
+				}
 			}
 #endif
 			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_BIT, SQL_BIT, 0, 0, pData, 0, pStrLen_or_IndPtr);
@@ -701,11 +716,14 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 #ifdef _SIZE_ERROR_MESSAGE
 			if(siDatasize != sizeof(char))
 			{
-				char err[2048] = "";
-				wsprintf( err, "ParamNo = %d, RequireSize = SQL_TINYINT(1Byte), InputSize = %d\n%s\n", siParamNo, siDatasize, m_pszQuery);
+				wchar_t err[1024] = { 0, };
+				wsprintf( err, L"ParamNo = %d, RequireSize = SQL_TINYINT(1Byte), InputSize = %d\n%s\n", siParamNo, siDatasize, m_pszQuery);
+				
 				BOOL bServer = REGULAR_SERVER ;
-				if ( !bServer )
-					MessageBox(NULL, err, "DataType is Wrong", MB_OK);
+				
+				if (!bServer) {
+					MessageBox(NULL, err, L"DataType is Wrong", MB_OK);
+				}
 			}
 #endif
 			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_TINYINT, SQL_TINYINT, 0, 0, pData, 0, pStrLen_or_IndPtr);
@@ -720,11 +738,14 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 #ifdef _SIZE_ERROR_MESSAGE
 			if(siDatasize != sizeof(short int))
 			{
-				char err[2048] = "";
-				wsprintf( err, "ParamNo = %d, RequireSize = SQL_SMALLINT(2Byte), InputSize = %d\n%s\n", siParamNo, siDatasize, m_pszQuery);
+				wchar_t err[1024] = { 0, };
+				wsprintf( err, L"ParamNo = %d, RequireSize = SQL_SMALLINT(2Byte), InputSize = %d\n%s\n", siParamNo, siDatasize, m_pszQuery);
+				
 				BOOL bServer = REGULAR_SERVER ;
-				if ( !bServer )
-					MessageBox(NULL, err, "DataType is Wrong", MB_OK);
+
+				if (!bServer) {
+					MessageBox(NULL, err, L"DataType is Wrong", MB_OK);
+				}
 			}
 #endif
 			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_SHORT, SQL_SMALLINT, 0, 0, pData, 0,pStrLen_or_IndPtr);
@@ -734,16 +755,19 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 
 	case SQL_INTEGER:
 		{
-			pStrLen_or_IndPtr = bNull?&m_siNULL:&m_siZero;
+			pStrLen_or_IndPtr = bNull ? &m_siNULL : &m_siZero;
 			_itoa_s( *((int*)(pData)), buffer, 10);
 #ifdef _SIZE_ERROR_MESSAGE
 			if(siDatasize != sizeof(int))
 			{
-				char err[2048] = "";
-				wsprintf( err, "ParamNo = %d, RequireSize = SQL_INTEGER(4Byte), InputSize = %d\n%s\n", siParamNo, siDatasize, m_pszQuery);
+				wchar_t err[2048] = { 0, };
+				wsprintf( err, L"ParamNo = %d, RequireSize = SQL_INTEGER(4Byte), InputSize = %d\n%s\n", siParamNo, siDatasize, m_pszQuery);
+				
 				BOOL bServer = REGULAR_SERVER ;
-				if ( !bServer )
-					MessageBox(NULL, err, "DataType is Wrong", MB_OK);
+				
+				if (!bServer) {
+					MessageBox(NULL, err, L"DataType is Wrong", MB_OK);
+				}
 			}
 #endif
 			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_LONG, SQL_INTEGER, 0, 0, pData, 0, pStrLen_or_IndPtr);
@@ -760,11 +784,14 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 #ifdef _SIZE_ERROR_MESSAGE
 			if(siDatasize != sizeof(__int64))
 			{
-				char err[2048] = "";
-				wsprintf( err, "ParamNo = %d, RequireSize = SQL_BIGINT(8Byte), InputSize = %d\n%s\n", siParamNo, siDatasize, m_pszQuery);
+				wchar_t err[2048] = { 0, };
+				wsprintf( err, L"ParamNo = %d, RequireSize = SQL_BIGINT(8Byte), InputSize = %d\n%s\n", siParamNo, siDatasize, m_pszQuery);
+				
 				BOOL bServer = REGULAR_SERVER ;
-				if ( !bServer )
-					MessageBox(NULL, err, "DataType is Wrong", MB_OK);
+
+				if (!bServer) {
+					MessageBox(NULL, err, L"DataType is Wrong", MB_OK);
+				}
 			}
 #endif
 			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_SBIGINT, SQL_BIGINT, 0, 0, pData, 0, pStrLen_or_IndPtr);
@@ -779,11 +806,14 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 #ifdef _SIZE_ERROR_MESSAGE
 			if(siDatasize != sizeof(float))
 			{
-				char err[2048] = "";
-				wsprintf( err, "ParamNo = %d, RequireSize = SQL_REAL(1Byte), InputSize = %d\n%s\n", siParamNo, siDatasize, m_pszQuery);
+				wchar_t err[2048] = { 0, };
+				wsprintf( err, L"ParamNo = %d, RequireSize = SQL_REAL(1Byte), InputSize = %d\n%s\n", siParamNo, siDatasize, m_pszQuery);
+				
 				BOOL bServer = REGULAR_SERVER ;
-				if ( !bServer )
-					MessageBox(NULL, err, "DataType is Wrong", MB_OK);
+				
+				if (!bServer) {
+					MessageBox(NULL, err, L"DataType is Wrong", MB_OK);
+				}
 			}
 #endif
 			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_FLOAT, SQL_REAL, 0, 0, pData, 0, pStrLen_or_IndPtr);
@@ -807,11 +837,14 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 #ifdef _SIZE_ERROR_MESSAGE
 			if(siDatasize != sizeof(TIMESTAMP_STRUCT))
 			{
-				char err[2048] = "";
-				wsprintf( err, "ParamNo = %d, RequireSize = SQL_TIMESTAMP(16Byte), InputSize = %d\n%s\n", siParamNo, siDatasize, m_pszQuery);
+				wchar_t err[2048] = { 0, };
+				wsprintf( err, L"ParamNo = %d, RequireSize = SQL_TIMESTAMP(16Byte), InputSize = %d\n%s\n", siParamNo, siDatasize, m_pszQuery);
+				
 				BOOL bServer = REGULAR_SERVER ;
-				if ( !bServer )
-					MessageBox(NULL, err, "DataType is Wrong", MB_OK);
+				
+				if (!bServer) {
+					MessageBox(NULL, err, L"DataType is Wrong", MB_OK);
+				}
 			}
 #endif
 			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_TYPE_TIMESTAMP, SQL_TYPE_TIMESTAMP, 23, 0, pData, 16, pStrLen_or_IndPtr);
@@ -916,7 +949,7 @@ int RichODBC::ExecSQL()
 
 	dwtimegettime	=	timeGetTime();
 
-	m_retcode = SQLExecDirect(m_hstmt,(SQLCHAR*)(LPSTR)(LPCSTR)m_pszQuery, SQL_NTS);
+	m_retcode = SQLExecDirectA(m_hstmt,(SQLCHAR*)(LPSTR)(LPCSTR)m_pszQuery, SQL_NTS);
 
 	time( &m_tEXECSP );
 
@@ -974,5 +1007,3 @@ VOID RichODBC::SetExternErrorHandler( pExternErrorHandler pexternerrorhandler )
 {
 	m_pExternErrorHandler	=	pexternerrorhandler;
 }
-
-#endif

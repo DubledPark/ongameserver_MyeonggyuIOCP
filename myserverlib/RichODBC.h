@@ -1,3 +1,5 @@
+#pragma once
+
 // RichODBC.h: interface for the RichODBC class.
 //
 //////////////////////////////////////////////////////////////////////
@@ -70,21 +72,22 @@ public:
 	int			GetData(void *pvData, long siDataSize = 0);
 	/////////////////////////////////////////////////////////*/
 	
-	BOOL		CheckMDAC(char *cRequire);
+	BOOL		CheckMDAC(wchar_t *cRequire);
 	BOOL		CheckError(SQLSMALLINT hType, SQLHANDLE handle,char* hint=NULL, HWND hwnd = NULL);
 	BOOL		IsSuccess(void);
 
 	int			m_siParamNo;
 	int			m_sicount;
-	SQLINTEGER	m_siParamSize;
+	INT64	m_siParamSize;
 
 //protected:
 	SQLHDBC		m_hdbc;
 	SQLHSTMT	m_hstmt;
 	SQLHENV		m_henv;
 
-	SQLUINTEGER	m_siRowcount;
-	SQLINTEGER	m_siNTS, m_siZero, m_siNULL;
+	INT64	m_siRowcount;
+	INT64	m_siNTS, m_siZero;
+	INT64		m_siNULL;
 	char		m_cConnectionString[1024];
 	char		*m_pszQuery;
 

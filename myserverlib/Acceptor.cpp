@@ -11,11 +11,11 @@ prototype(prototype), theAsynchEventManager(theAsynchEventManager)
 	sprintf(filestr, "%05d", port);
 	socketValue = socket( AF_INET, SOCK_STREAM, 0 );
 
-    if ( socketValue == INVALID_SOCKET )
-		throw new ASIOException(GetLastError(), "ListenSocket dont create");    
+	if (socketValue == INVALID_SOCKET) {
+		throw new ASIOException(GetLastError(), "ListenSocket dont create");
+	}
 
 	SOCKADDR_IN sin;
-
     sin.sin_family = AF_INET;
     sin.sin_port = htons(port);    
 	sin.sin_addr.s_addr = inet_addr(address);
@@ -40,7 +40,9 @@ prototype(prototype), theAsynchEventManager(theAsynchEventManager)
 		if( 0 != error )
 		{
 			closesocket( socketValue );
+			
 			_snprintf(estr, sizeof(estr), "½ÇÆÐ : bind [%s]", errmsg );
+
 			throw new ASIOException(error, estr);
 		}
     }
@@ -69,11 +71,6 @@ prototype(prototype), theAsynchEventManager(theAsynchEventManager)
     }
 
 	logmsg(" %s %d accept started\n", address, port);
-}
-
-Acceptor::~Acceptor()
-{
-
 }
 
 void Acceptor::logmsg(char * format,...)
@@ -127,7 +124,7 @@ void Acceptor::run()
 
 	logmsg("acceptor thread started %d thread\n", ::GetCurrentThreadId());
 	
-	while(TRUE == isStart())
+	while(IsStart())
 	{		
 		Sleep(1);
 
@@ -141,10 +138,7 @@ void Acceptor::run()
 			
 		}
 
-		logmsg(" accepted %d.%d.%d.%d \n" , addr.sin_addr.S_un.S_un_b.s_b1, addr.sin_addr.S_un.S_un_b.s_b2, addr.sin_addr.S_un.S_un_b.s_b3, addr.sin_addr.S_un.S_un_b.s_b4);
-		
-
-
+		logmsg(" accepted %d.%d.%d.%d \n" , addr.sin_addr.S_un.S_un_b.s_b1, addr.sin_addr.S_un.S_un_b.s_b2, addr.sin_addr.S_un.S_un_b.s_b3, addr.sin_addr.S_un.S_un_b.s_b4);			
 
 		theAsynchEventManager->registerSocket(remoteClientSocket, prototype, addr);		
 	

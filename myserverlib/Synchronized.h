@@ -1,9 +1,5 @@
-#ifndef Synchronized_H
-#define Synchronized_H
-
 #pragma once
 
-#include "variver.h"
 #include <windows.h>
 
 	
@@ -20,46 +16,47 @@ private:
 };
 
 class Synchronized
-{
-	Synchronizable*	m_obj;
+{	
 public:
 
 	class NullSynchronizableException
 	{
 	public:
-		NullSynchronizableException(){}
-
-		virtual ~NullSynchronizableException() {}
+		NullSynchronizableException() = default;
+		virtual ~NullSynchronizableException() = default;
 	};
 
 	Synchronized(Synchronizable* obj) : m_obj(obj)
 	{
-		if( 0 == m_obj )
+		if (m_obj == nullptr) {
 			throw new NullSynchronizableException();
+		}
+
 		m_obj->accquire();
 	}
 
 	virtual ~Synchronized()
 	{
-		if(m_obj)
+		if (m_obj) {
 			m_obj->release();
+		}
 	}
 
+
+private:
+	Synchronizable*	m_obj = nullptr;
 };
 
-class CriticalSectionLock : public Synchronizable
-{
-	CRITICAL_SECTION		cs;
-	DWORD					owningThread;
-	int						nestingLevel;
+class CriticalSectionLockWrapper : public Synchronizable
+{	
 public:
 
-	CriticalSectionLock() : owningThread(0), nestingLevel(0)
+	CriticalSectionLockWrapper() : owningThread(0), nestingLevel(0)
 	{
-		InitializeCriticalSection( &cs );
+		InitializeCriticalSectionAndSpinCount( &cs, 0x00000400);
 	}
 
-	virtual ~CriticalSectionLock()
+	virtual ~CriticalSectionLockWrapper()
 	{
 		DeleteCriticalSection( &cs );
 	}
@@ -103,13 +100,17 @@ private:
 
 	friend class Synchronized;
 
+
+private:
+	CRITICAL_SECTION		cs;
+	DWORD					owningThread;
+	int						nestingLevel;
 };
+
+
 
 class SemaphoreLock : public Synchronizable
 {
-	HANDLE			semaphore;
-	DWORD			owningThread;
-	int				nestingLevel;
 public:
 
 	SemaphoreLock() : owningThread(0), nestingLevel(0)
@@ -161,16 +162,17 @@ private:
 	}
 
 	friend class Synchronized;
+
+
+private:
+	HANDLE			semaphore;
+	DWORD			owningThread;
+	int				nestingLevel;
 };
 
 class Waiter
 {
-private:
-
-	HANDLE				awakeningEvnet;
-
 public:
-
 	Waiter()
 	{
 		awakeningEvnet = CreateEvent(0, false, false, 0);
@@ -198,17 +200,16 @@ public:
 
 	void wait(long timeout)
 	{
-		if (WaitForSingleObject(awakeningEvnet, timeout) == WAIT_ABANDONED) 
-		{
-			;
+		if (WaitForSingleObject(awakeningEvnet, timeout) == WAIT_ABANDONED) {
+			; //nothing
 		}
 	}
 
+private:
+	HANDLE				awakeningEvnet;
 };
 
 
-
-#endif
 
 
 
