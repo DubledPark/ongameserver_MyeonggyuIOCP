@@ -5,7 +5,7 @@
 #include <time.h>
 
 Acceptor::Acceptor(INetworkSender* theAsynchEventManager, AsynchSocket* prototype, const char* address, u_short port) :
-prototype(prototype), theAsynchEventManager(theAsynchEventManager)
+m_prototype(prototype), theAsynchEventManager(theAsynchEventManager)
 {
 	memset(filestr, 0, sizeof(filestr));
 	sprintf(filestr, "%05d", port);
@@ -100,7 +100,7 @@ void Acceptor::logmsg(char * format,...)
 	
 	// *((char *)szbuff + strlen(szbuff)) = '\n';
 
-	DWORD rtwirte = 0;
+	//DWORD rtwirte = 0;
 	//WriteConsole(g_hOut,szbuff,lstrlen(szbuff),&rtwirte,0);
 	
 	sprintf(szpath,"./asio/Accept_[%s][%s].txt",filestr, szdate);
@@ -140,7 +140,7 @@ void Acceptor::run()
 
 		logmsg(" accepted %d.%d.%d.%d \n" , addr.sin_addr.S_un.S_un_b.s_b1, addr.sin_addr.S_un.S_un_b.s_b2, addr.sin_addr.S_un.S_un_b.s_b3, addr.sin_addr.S_un.S_un_b.s_b4);			
 
-		theAsynchEventManager->registerSocket(remoteClientSocket, prototype, addr);		
+		theAsynchEventManager->registerSocket(remoteClientSocket, m_prototype, addr);		
 	
 	}
 }

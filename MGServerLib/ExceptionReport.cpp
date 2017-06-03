@@ -86,8 +86,10 @@ void CExceptionReport::SetProgramName( PTSTR pszProgramName )
 
 		PTSTR pszDot = m_szLogPrefixName;
 	    // Look for the '.' before the "EXE" extension. Replace '.' to '\0'
-	    if( (pszDot = _tcsrchr( pszDot, _T('.') )) )
+		if ((pszDot = _tcsrchr(pszDot, _T('.')))) {
 			*pszDot = 0;
+		}
+
 		_tsplitpath( m_szLogPrefixName, szDrive, szDir, szFilename, szExt );
 		_tcscpy( m_szLogPrefixName, szFilename );
 	} else {
@@ -297,6 +299,8 @@ void CExceptionReport::WriteBasicInfo( PEXCEPTION_RECORD pExceptionRecord )
 //
 void CExceptionReport::WriteRegistersInfo( PCONTEXT pContext )
 {
+	UNREFERENCED_PARAMETER(pContext);
+
 #ifdef _M_IX86  // X86 Only!
 	_tprintf( _T( "------------------------------------------------------------------------------\r\n" ) );
     _tprintf( _T( "    x86 Registers\r\n" ) );
@@ -517,7 +521,9 @@ void CExceptionReport::WriteStackDetails( PCONTEXT pContext, BOOL bWriteVariable
 //
 BOOL CALLBACK CExceptionReport::EnumerateSymbolsCallback( PSYMBOL_INFO  pSymInfo, ULONG SymbolSize, PVOID UserContext )
 {
-    char szBuffer[2048];
+	UNREFERENCED_PARAMETER(SymbolSize);
+	
+	char szBuffer[2048];
 
     __try {
         if( FormatSymbolValue( pSymInfo, (STACKFRAME*)UserContext, szBuffer, sizeof(szBuffer) ) )
@@ -535,6 +541,8 @@ BOOL CALLBACK CExceptionReport::EnumerateSymbolsCallback( PSYMBOL_INFO  pSymInfo
 //
 BOOL CExceptionReport::FormatSymbolValue( PSYMBOL_INFO pSym, STACKFRAME * sf, char * pszBuffer, unsigned cbBuffer )
 {
+	UNREFERENCED_PARAMETER(cbBuffer);
+
     char * pszCurrBuffer = pszBuffer;
 
     // Indicate if the variable is a local or parameter

@@ -3,7 +3,7 @@
 
 void MGServerReceiver::notifyRegisterSocket(ASSOCKDESCEX& sockdesc, SOCKADDR_IN& ip)
 {
-	printf(" Connected %d\n", sockdesc.assockUid);
+	printf(" Connected %l64d\n", sockdesc.assockUid);
 
 	Synchronized es(&m_SessionLock);
            
@@ -12,7 +12,7 @@ void MGServerReceiver::notifyRegisterSocket(ASSOCKDESCEX& sockdesc, SOCKADDR_IN&
 
 void MGServerReceiver::notifyReleaseSocket(ASSOCKDESCEX& sockdesc)
 {
-	printf("Disconnected %d\n", sockdesc.assockUid);
+	printf("Disconnected %l64d\n", sockdesc.assockUid);
 
 	Synchronized es(&m_SessionLock);
            
@@ -32,11 +32,6 @@ void MGServerReceiver::notifyMessage(ASSOCKDESCEX& sockdesc, size_t length, char
 		sockdesc.psender->postingSend(sockdesc, length, pbuffer);
 
 	delete pbuffer;
-}
-
-void MGServerReceiver::notifyConnectingResult(INT32 requestID, ASSOCKDESCEX& sockdesc, DWORD error)
-{
-
 }
 
 void MGServerReceiver::Process()

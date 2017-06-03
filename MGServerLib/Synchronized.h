@@ -79,8 +79,9 @@ private:
 
 	virtual void accquireTimeOut(DWORD limit)
 	{
-		accquire();
-		
+		UNREFERENCED_PARAMETER(limit);
+
+		accquire();		
 	}
 
 	virtual void release()
@@ -144,6 +145,7 @@ private:
 
 	virtual void accquireTimeOut(DWORD limit)
 	{
+		UNREFERENCED_PARAMETER(limit);
 	}
 
 	virtual void release()

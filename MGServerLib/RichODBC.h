@@ -38,8 +38,8 @@ public:
 	int			GetData(int iColNo, void *pvData, long siDataSize);
 public:
 	VOID		GetResult(VOID *pvResult, long siDatasize);
-	const int	GetRowcount();
-	const int	GetRetcode() { return m_retcode; }
+	const INT64	GetRowcount();
+	const RETCODE	GetRetcode() { return m_retcode; }
 
 	VOID		SetPooling(BOOL data) { IsPooling = data; }
 
@@ -131,6 +131,8 @@ public:
 
 	XDBException(int c,const char * m):code(0) 
 	{
+		UNREFERENCED_PARAMETER(c);
+
 		strncpy_s( msg, m, sizeof(msg) );
 		//#ifndef TEST
 		//	  Log & log=*Log::Instance();

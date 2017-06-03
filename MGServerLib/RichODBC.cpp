@@ -53,13 +53,13 @@ void RichODBC::MakeTIMESTAMP_STRUCT( time_t& src, TIMESTAMP_STRUCT& dest )
 	tm tmsrc;
 	localtime_s( &tmsrc, &src );
 
-	dest.day = tmsrc.tm_mday;
+	dest.day = (SQLUSMALLINT)tmsrc.tm_mday;
 	dest.fraction = 0;
-	dest.hour = tmsrc.tm_hour;
-	dest.minute = tmsrc.tm_min;
-	dest.month = tmsrc.tm_mon + 1;
-	dest.second = tmsrc.tm_sec;
-	dest.year = tmsrc.tm_year + 1900;
+	dest.hour = (SQLUSMALLINT)tmsrc.tm_hour;
+	dest.minute = (SQLUSMALLINT)tmsrc.tm_min;
+	dest.month = (SQLUSMALLINT)(tmsrc.tm_mon + 1);
+	dest.second = (SQLUSMALLINT)tmsrc.tm_sec;
+	dest.year = (SQLUSMALLINT)(tmsrc.tm_year + 1900);
 
 	dest.year = dest.year;
 }
@@ -302,9 +302,9 @@ int RichODBC::SetQuery(char *pszQuery)
 {
 	Prepare();
 
-	if (sizeof(pszQuery) >= MAX_QUERY_SIZE) {
+	/*if (sizeof(pszQuery) >= MAX_QUERY_SIZE) {
 		MessageBox(NULL, L"not enougth buffer.", L"Error", MB_OK);
-	}
+	}*/
 
 	strncpy_s( m_pszQuery, sizeof(m_pszQuery), pszQuery, MAX_QUERY_SIZE );
 
@@ -345,7 +345,7 @@ int RichODBC::GetData(int iColNo, void* pvData, long lDataSize)
 {
 	SQLLEN ntd;
 	if (IsSuccess()) {
-		m_retcode = SQLGetData(m_hstmt, iColNo, SQL_C_DEFAULT, pvData, lDataSize, &ntd);
+		m_retcode = SQLGetData(m_hstmt, (SQLUSMALLINT)iColNo, SQL_C_DEFAULT, pvData, lDataSize, &ntd);
 	}
 	else 
 	{
@@ -370,7 +370,7 @@ int RichODBC::GetData(int iColNo, int iType, void* pvData, long lDataSize)
 	SQLLEN ntd;
 	if(IsSuccess())
 	{
-		m_retcode = SQLGetData(m_hstmt, iColNo, iType, pvData, lDataSize, &ntd);
+		m_retcode = SQLGetData(m_hstmt, (SQLUSMALLINT)iColNo, (SQLUSMALLINT)iType, pvData, lDataSize, &ntd);
 		
 		if (m_retcode == -1) {
 			CheckError(SQL_HANDLE_STMT, m_hstmt, m_pszQuery);
@@ -465,6 +465,8 @@ return : N/A
 ////////////////////////////////////////////////////////////////////*/
 BOOL RichODBC::CheckError(SQLSMALLINT hType, SQLHANDLE handle, char* hint, HWND hwnd)
 {
+	UNREFERENCED_PARAMETER(hwnd);
+
 	// bug 2011-2-9 err에 문자열 셋팅을 하면서 스택이 훼손된다.
 	SQLCHAR     SqlState[16];
 	SQLCHAR		Msg[SQL_MAX_MESSAGE_LENGTH];
@@ -625,7 +627,7 @@ Param1 : N/A
 Desc : 리턴된 결과의 최대 줄 수를 얻는다.
 return : int
 ////////////////////////////////////////////////////////////////////*/
-const int RichODBC::GetRowcount()
+const INT64 RichODBC::GetRowcount()
 {
 	return m_siRowcount;
 }
@@ -666,7 +668,7 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 	case SQL_WCHAR:
 		{
 			pStrLen_or_IndPtr = bNull? &m_siNULL : &m_siNTS;
-			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_WCHAR, SQL_WCHAR, siDatasize, 0, pData, 0, pStrLen_or_IndPtr);
+			m_retcode = SQLBindParameter(m_hstmt, (SQLUSMALLINT)siParamNo, siParamType, SQL_C_WCHAR, SQL_WCHAR, siDatasize, 0, pData, 0, pStrLen_or_IndPtr);
 			//PrintParam((char*)pData);
 		}
 		break;
@@ -674,7 +676,7 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 	case SQL_CHAR:
 		{
 			pStrLen_or_IndPtr = bNull?&m_siNULL:&m_siNTS;
-			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_CHAR, SQL_CHAR, siDatasize, 0, pData, 0, pStrLen_or_IndPtr);
+			m_retcode = SQLBindParameter(m_hstmt, (SQLUSMALLINT)siParamNo, siParamType, SQL_C_CHAR, SQL_CHAR, siDatasize, 0, pData, 0, pStrLen_or_IndPtr);
 			PrintParam((char*)pData);
 		}
 		break;
@@ -682,7 +684,7 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 	case SQL_VARCHAR:
 		{
 			pStrLen_or_IndPtr = bNull?&m_siNULL:&m_siNTS;
-			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_TCHAR, SQL_VARCHAR, siDatasize, 0, pData, 0, pStrLen_or_IndPtr);
+			m_retcode = SQLBindParameter(m_hstmt, (SQLUSMALLINT)siParamNo, siParamType, SQL_C_TCHAR, SQL_VARCHAR, siDatasize, 0, pData, 0, pStrLen_or_IndPtr);
 			PrintParam((char*)pData);
 		}
 		break;
@@ -704,7 +706,7 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 				}
 			}
 #endif
-			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_BIT, SQL_BIT, 0, 0, pData, 0, pStrLen_or_IndPtr);
+			m_retcode = SQLBindParameter(m_hstmt, (SQLUSMALLINT)siParamNo, siParamType, SQL_C_BIT, SQL_BIT, 0, 0, pData, 0, pStrLen_or_IndPtr);
 			PrintParam(buffer);
 		}
 		break;
@@ -726,7 +728,7 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 				}
 			}
 #endif
-			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_TINYINT, SQL_TINYINT, 0, 0, pData, 0, pStrLen_or_IndPtr);
+			m_retcode = SQLBindParameter(m_hstmt, (SQLUSMALLINT)siParamNo, siParamType, SQL_C_TINYINT, SQL_TINYINT, 0, 0, pData, 0, pStrLen_or_IndPtr);
 			PrintParam(buffer);
 		}
 		break;
@@ -748,7 +750,7 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 				}
 			}
 #endif
-			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_SHORT, SQL_SMALLINT, 0, 0, pData, 0,pStrLen_or_IndPtr);
+			m_retcode = SQLBindParameter(m_hstmt, (SQLUSMALLINT)siParamNo, siParamType, SQL_C_SHORT, SQL_SMALLINT, 0, 0, pData, 0,pStrLen_or_IndPtr);
 			PrintParam(buffer);
 		}
 		break;
@@ -770,7 +772,7 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 				}
 			}
 #endif
-			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_LONG, SQL_INTEGER, 0, 0, pData, 0, pStrLen_or_IndPtr);
+			m_retcode = SQLBindParameter(m_hstmt, (SQLUSMALLINT)siParamNo, siParamType, SQL_C_LONG, SQL_INTEGER, 0, 0, pData, 0, pStrLen_or_IndPtr);
 			PrintParam(buffer);
 		}
 		break;
@@ -794,7 +796,7 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 				}
 			}
 #endif
-			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_SBIGINT, SQL_BIGINT, 0, 0, pData, 0, pStrLen_or_IndPtr);
+			m_retcode = SQLBindParameter(m_hstmt, (SQLUSMALLINT)siParamNo, siParamType, SQL_C_SBIGINT, SQL_BIGINT, 0, 0, pData, 0, pStrLen_or_IndPtr);
 			PrintParam(buffer);
 		}
 		break;
@@ -816,7 +818,7 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 				}
 			}
 #endif
-			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_FLOAT, SQL_REAL, 0, 0, pData, 0, pStrLen_or_IndPtr);
+			m_retcode = SQLBindParameter(m_hstmt, (SQLUSMALLINT)siParamNo, siParamType, SQL_C_FLOAT, SQL_REAL, 0, 0, pData, 0, pStrLen_or_IndPtr);
 			PrintParam(buffer);
 		}
 		break;
@@ -825,7 +827,7 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 		{
 			pStrLen_or_IndPtr = bNull?&m_siNULL:&m_siParamSize;
 			m_siParamSize = siDatasize; // StrLen_or_IndPtr인자는 값을 Execute시에 참조하므로 지역변수로 값을 대입하면 않된다.
-			m_retcode = SQLBindParameter(m_hstmt, siParamNo, SQL_PARAM_INPUT, SQL_C_BINARY, SQL_BINARY, siDatasize, 0, pData, siDatasize, pStrLen_or_IndPtr);
+			m_retcode = SQLBindParameter(m_hstmt, (SQLUSMALLINT)siParamNo, SQL_PARAM_INPUT, SQL_C_BINARY, SQL_BINARY, siDatasize, 0, pData, siDatasize, pStrLen_or_IndPtr);
 			PrintParam("binary data");
 		}
 		break;
@@ -847,7 +849,7 @@ VOID RichODBC::SetParam(int siParamNo, int siType, void *pData, int siDatasize, 
 				}
 			}
 #endif
-			m_retcode = SQLBindParameter(m_hstmt, siParamNo, siParamType, SQL_C_TYPE_TIMESTAMP, SQL_TYPE_TIMESTAMP, 23, 0, pData, 16, pStrLen_or_IndPtr);
+			m_retcode = SQLBindParameter(m_hstmt, (SQLUSMALLINT)siParamNo, siParamType, SQL_C_TYPE_TIMESTAMP, SQL_TYPE_TIMESTAMP, 23, 0, pData, 16, pStrLen_or_IndPtr);
 			PrintParam(buffer);
 		}
 		break;
@@ -900,6 +902,8 @@ void RichODBC::WriteQuery()
 
 void RichODBC::WriteMSG(char* msg, size_t length)
 {
+	UNREFERENCED_PARAMETER(length);
+
 	SYSTEMTIME CT;
 	GetLocalTime(&CT);
 

@@ -241,7 +241,6 @@ public:
 	//socketUniqueId: 소켓관리번호, 연결통보시 넘겨준 관리번호 [SOCKET으로 주어지는 번호와는 다르다!], 자료구조키값임
 	//length: 길이
 	//data: 실제 내용
-	//virtual DWORD postingSend(ULONG_PTR socketUniqueId, LARGE_INTEGER* tick, size_t length, char* data) = 0;
 	virtual DWORD postingSend(ASSOCKDESC& sockdesc, size_t length, char* data) = 0;
 
 	//연결해제 요청
@@ -262,7 +261,6 @@ public:
 	// 동기화 이슈: 이 함수를 호출하는 문맥/객체 는 INetworkReceiver::notifyConnectingResult 를 호출하는 문맥과 해당 함수를 구현한 객체와 전혀 다른것이어야 한다.
 	// 이 함수는 windows xp, windows 2003 server 운영체제에서만 작동한다.
 	// 20081215: ConnectEx()를 지원하지 않는 경우엔 ConnectThread로 돌아가게 처리하자.
-	//virtual bool connectSocket( int& out_socketUniqueId, LARGE_INTEGER& out_tick, AsynchSocket* prototype, char* ip, int port ) = 0;
 	virtual DWORD connectSocket(INT32 reqeusterID, AsynchSocket* prototype, char* ip, u_short port ) = 0;
 
 	// 20070411

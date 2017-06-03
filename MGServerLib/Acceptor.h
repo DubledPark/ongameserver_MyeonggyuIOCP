@@ -18,7 +18,7 @@ protected:
 
 
 private:
-	AsynchSocket*		prototype; //socket creator : prototype patterns
+	AsynchSocket*		m_prototype; //socket creator : prototype patterns
 	SOCKET				socketValue; //listen socket
 	INetworkSender*		theAsynchEventManager;
 	char				filestr[1024];

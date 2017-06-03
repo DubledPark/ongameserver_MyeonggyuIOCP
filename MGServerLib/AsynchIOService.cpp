@@ -564,7 +564,7 @@ DWORD AsynchIOService::connectSocket(INT32 reqeusterID, AsynchSocket* prototype,
 	op->optype = OverlappedOperation::eOpType_Connect;
 	op->requesterID = reqeusterID;
 
-	DWORD sent = 0;
+	//DWORD sent = 0;
 	int namelen = (int)sizeof(sockAddr);
 	SOCKADDR_IN localAddr;
 	memset(&localAddr, 0, sizeof(localAddr)); 
@@ -613,18 +613,21 @@ DWORD AsynchIOService::registerSocket(SOCKET sockid, AsynchSocket* prototype, SO
 		Synchronized es(&entireSynch);
 
 		// clone prototype? or already cloned prototype instance?
-		if(INVALID_SOCKET == sockid)
+		if (INVALID_SOCKET == sockid) {
 			return WSAENOTSOCK;
+		}
 
-		if(NULL == prototype)
+		if (NULL == prototype) {
 			return WSAEACCES;
+		}
 
 		//logmsg("socket clone\n");
 
 		AsynchSocket* as = static_cast<AsynchSocket*>(prototype->clone());
-		if(NULL == as)
-			return WSAENOBUFS;		
-		
+		if (NULL == as) {
+			return WSAENOBUFS;
+		}
+
 		// Is already contains at theASSocks?
 		tASSOCKMAPITER iter = theASSocks.find(as->getASSOCKUID());
 		if(iter != theASSocks.end())
@@ -640,7 +643,8 @@ DWORD AsynchIOService::registerSocket(SOCKET sockid, AsynchSocket* prototype, SO
 		HANDLE hret = CreateIoCompletionPort((HANDLE)sockid, iocpHandle, as->getASSOCKUID(), 0);
 		if(hret == NULL)
 		{
-			DWORD error = GetLastError();
+			//DWORD error = GetLastError();
+			
 			// temp code delete as
 			//socket->disconnect();		
 			//delete socket;
@@ -664,7 +668,7 @@ DWORD AsynchIOService::registerSocket(SOCKET sockid, AsynchSocket* prototype, SO
 		// posting read [by reference counter mechanism]
 		//	increase ref counter, and call postRead
 		//	why? ref counter is read(1), write(1)
-		LONG ref = as->enterIO();
+		 //LONG ref = as->enterIO();
 
 		//logmsg("first read\n");
 
