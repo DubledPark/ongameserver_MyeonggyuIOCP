@@ -3,7 +3,9 @@
 
 void MGServerReceiver::notifyRegisterSocket(ASSOCKDESCEX& sockdesc, SOCKADDR_IN& ip)
 {
-	printf(" Connected %l64d\n", sockdesc.assockUid);
+	UNREFERENCED_PARAMETER(ip);
+
+	printf("Connected %llu\n", sockdesc.assockUid);
 
 	Synchronized es(&m_SessionLock);
            
@@ -12,7 +14,7 @@ void MGServerReceiver::notifyRegisterSocket(ASSOCKDESCEX& sockdesc, SOCKADDR_IN&
 
 void MGServerReceiver::notifyReleaseSocket(ASSOCKDESCEX& sockdesc)
 {
-	printf("Disconnected %l64d\n", sockdesc.assockUid);
+	printf("Disconnected %llu\n", sockdesc.assockUid);
 
 	Synchronized es(&m_SessionLock);
            

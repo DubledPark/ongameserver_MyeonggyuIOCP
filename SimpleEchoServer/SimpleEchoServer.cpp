@@ -12,6 +12,9 @@
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+	UNREFERENCED_PARAMETER(argc);
+	UNREFERENCED_PARAMETER(argv);
+
 	WSADATA wsaData;
 	WORD wVer = MAKEWORD(2,2);    
 	if (WSAStartup(wVer,&wsaData) != NO_ERROR)
